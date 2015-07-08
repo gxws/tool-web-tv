@@ -7,18 +7,18 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.gxws.tool.web.tv.core.WebTvCore;
+import com.gxws.tool.web.tv.data.TvUserInfo;
+
 /**
+ * 处理电视机顶盒访问参数
+ * 
  * @author zhuwl120820@gxwsxx.com
- * @since
+ * @since 1.0
  */
 public class TvInterceptor implements HandlerInterceptor {
 
-	private final String[] INIT_NAME = new String[] { "user_id", "device_id",
-			"area_code" };
-
-	private final String[] NAME = new String[] { "dvbId", "stbId", "areaId" };
-
-	private final String TV_STB_INFO = "tvStbInfo";
+	private WebTvCore core = new WebTvCore();
 
 	/**
 	 * @see org.springframework.web.servlet.HandlerInterceptor#preHandle(javax.servlet.http.HttpServletRequest,
@@ -28,22 +28,10 @@ public class TvInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
 		HttpSession session = request.getSession();
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < NAME.length; i++) {
-			String v = request.getParameter(NAME[i]);
-			if (null == v || "".equals(v)) {
-				v = request.getParameter(INIT_NAME[i]);
-				if (null == v || "".equals(v)) {
-					continue;
-				}
-			}
-			session.setAttribute(NAME[i], v);
-			sb.append("&");
-			sb.append(NAME[i]);
-			sb.append("=");
-			sb.append(v);
-		}
-		session.setAttribute(TV_STB_INFO, sb.toString());
+		TvUserInfo info = core.getTvUserInfo(request);
+		session.setAttribute(TvUserInfo.TV_USER_INFO_URL_PARAM_NAME,
+				info.urlParam());
+		session.setAttribute(TvUserInfo.TV_USER_INFO_OBJECT_NAME, info);
 		return true;
 	}
 
@@ -56,7 +44,23 @@ public class TvInterceptor implements HandlerInterceptor {
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
+		String type = core.getTvUserInfo(request).getStbType();
+		if (null == type || "".equals(type)) {
+			type = "";
+		} else {
+			type = type + "/";
+		}
+		if (null != modelAndView) {
+			// jsp文件路径
+			String jspPath = modelAndView.getViewName();
+			if (jspPath.startsWith("forward")) {
 
+			} else if (jspPath.startsWith("redirect")) {
+
+			} else {
+				modelAndView.setViewName(type + jspPath);
+			}
+		}
 	}
 
 	/**
