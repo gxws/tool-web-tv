@@ -17,6 +17,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${version.springframework}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- servlet begin -->
@@ -30,6 +31,7 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>${version.servlet.jstl}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
