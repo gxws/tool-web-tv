@@ -2,23 +2,24 @@ package com.gxws.tool.web.tv.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gxws.tool.web.tv.core.WebTvCore;
-import com.gxws.tool.web.tv.data.TvUserInfo;
+import com.gxws.tool.web.tv.data.WebTvParam;
 
 /**
  * 处理电视机顶盒访问参数
  * 
  * @author zhuwl120820@gxwsxx.com
- * @deprecated 使用com.gxws.tool.web.tv.interceptor.WebTvInterceptor替代
- * @since 1.0
+ * @since 1.1
  */
-@Deprecated
-public class TvInterceptor implements HandlerInterceptor {
+public class WebTvInterceptor implements HandlerInterceptor {
+
+	private static final Logger LOG = LoggerFactory.getLogger(WebTvInterceptor.class);
 
 	private WebTvCore core = new WebTvCore();
 
@@ -29,11 +30,14 @@ public class TvInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		HttpSession session = request.getSession();
-		TvUserInfo info = core.getTvUserInfo(request);
-		session.setAttribute(TvUserInfo.TV_USER_INFO_URL_PARAM_NAME, info.urlParam());
-		session.setAttribute(TvUserInfo.TV_USER_INFO_OBJECT_NAME, info);
-		return true;
+		try {
+			WebTvParam param = core.handleRequest(request);
+			request.setAttribute(WebTvParam.ATTR_NAME, param);
+			return true;
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return false;
+		}
 	}
 
 	/**
@@ -44,23 +48,11 @@ public class TvInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		// String type = core.getTvUserInfo(request).getStbType();
-		// if (null == type || "".equals(type)) {
-		// type = "";
-		// } else {
-		// type = type + "/";
-		// }
-		// if (null != modelAndView) {
-		// // jsp文件路径
-		// String jspPath = modelAndView.getViewName();
-		// if (jspPath.startsWith("forward")) {
-		//
-		// } else if (jspPath.startsWith("redirect")) {
-		//
-		// } else {
-		// modelAndView.setViewName(type + jspPath);
-		// }
-		// }
+//		WebTvParam param = (WebTvParam) request.getAttribute(WebTvParam.ATTR_NAME);
+//		if (null != param) {
+//			String urlparam = core.handleUrlParam(param);
+//			request.setAttribute(WebTvParam.URL_PARAM_NAME, urlparam);
+//		}
 	}
 
 	/**
