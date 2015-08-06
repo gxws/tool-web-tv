@@ -1,14 +1,18 @@
 package com.gxws.tool.web.tv.core;
 
 import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.gxws.tool.web.tv.annotation.WebTvParameter;
+import com.gxws.tool.web.tv.data.StbType;
 import com.gxws.tool.web.tv.data.TvUserInfo;
 import com.gxws.tool.web.tv.data.TvUserInfoType;
 import com.gxws.tool.web.tv.data.WebTvParam;
+import com.gxws.tool.web.tv.exception.WebTvParameterIllegalException;
 import com.gxws.tool.web.tv.exception.WebTvParameterMissingException;
 
 /**
@@ -18,6 +22,8 @@ import com.gxws.tool.web.tv.exception.WebTvParameterMissingException;
  * @since 1.0
  */
 public class WebTvCore {
+
+	private static final Pattern STB_0203 = Pattern.compile("(Safari)|(Chrome)", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * 处理request参数
@@ -29,17 +35,23 @@ public class WebTvCore {
 	 * @throws WebTvParameterMissingException
 	 *             必要的参数缺失
 	 * @throws IllegalArgumentException
+	 *             非法参数异常
 	 * @throws IllegalAccessException
+	 *             非法访问权限异常
+	 * @throws WebTvParameterIllegalException
+	 *             必要的参数非法异常
 	 * @since 1.1
 	 */
-	public WebTvParam handleRequest(HttpServletRequest req)
-			throws WebTvParameterMissingException, IllegalArgumentException, IllegalAccessException {
+	public WebTvParam handleRequest(HttpServletRequest req) throws WebTvParameterMissingException,
+			IllegalArgumentException, IllegalAccessException, WebTvParameterIllegalException {
 		WebTvParam param = new WebTvParam();
 		Class<WebTvParam> cls = WebTvParam.class;
 		Field[] fields = cls.getDeclaredFields();
 		for (Field f : fields) {
 			handleField(f, param, req);
 		}
+		StbType type = handleStbType(param, req);
+		param.setStbType(type.getKey());
 		String url = handleUrlParam(param);
 		param.setUrl(url);
 		return param;
@@ -58,8 +70,10 @@ public class WebTvCore {
 	 * @throws WebTvParameterMissingException
 	 *             必要的参数缺失
 	 * @throws IllegalArgumentException
+	 *             非法参数异常
 	 * @throws IllegalAccessException
-	 * @since
+	 *             非法访问权限异常
+	 * @since 1.1
 	 */
 	public void handleField(Field f, WebTvParam param, HttpServletRequest req)
 			throws WebTvParameterMissingException, IllegalArgumentException, IllegalAccessException {
@@ -94,7 +108,9 @@ public class WebTvCore {
 	 *            web tv参数对象
 	 * @return 返回url参数
 	 * @throws IllegalArgumentException
+	 *             非法参数异常
 	 * @throws IllegalAccessException
+	 *             非法访问权限异常
 	 * @since 1.1
 	 */
 	public String handleUrlParam(WebTvParam param) throws IllegalArgumentException, IllegalAccessException {
@@ -122,6 +138,38 @@ public class WebTvCore {
 	}
 
 	/**
+	 * 处理机顶盒类型
+	 * 
+	 * @author zhuwl120820@gxwsxx.com
+	 * @param param
+	 *            web tv参数对象
+	 * @param req
+	 *            HttpServletRequest对象
+	 * @return 机顶盒类型枚举对象
+	 * @throws WebTvParameterIllegalException
+	 *             必要的参数非法异常
+	 * @since 1.1
+	 */
+	public StbType handleStbType(WebTvParam param, HttpServletRequest req) throws WebTvParameterIllegalException {
+		StbType type = StbType.fromValue(param.getStbType());
+		if (null == type) {
+			WebTvParameterIllegalException e = new WebTvParameterIllegalException();
+			e.setParam("stbType", "机顶盒类型");
+			throw e;
+		}
+		if (StbType.THREE.equals(type)) {
+			return StbType.THREE;
+		}
+		String ua = req.getHeader("User-Agent");
+		Matcher m2 = STB_0203.matcher(ua);
+		if (m2.find()) {
+			return StbType.TWO;
+		} else {
+			return StbType.ONE;
+		}
+	}
+
+	/**
 	 * 获取参数名
 	 * 
 	 * @author zhuwl120820@gxwsxx.com
@@ -129,8 +177,8 @@ public class WebTvCore {
 	 *            web tv 注解对象
 	 * @param f
 	 *            字段
-	 * @return
-	 * @since
+	 * @return 参数名
+	 * @since 1.1
 	 */
 	private String getName(WebTvParameter ann, Field f) {
 		String name = ann.name()[0];
