@@ -10,8 +10,10 @@ import com.gxws.tool.web.tv.data.TvUserInfo;
  * session工具
  * 
  * @author zhuwl120820@gxwsxx.com
+ * @deprecated 由com.gxws.tool.web.tv.core.WebTvCore替代相应的功能
  * @since 1.0
  */
+@Deprecated
 public class WebTvTool {
 
 	private static WebTvCore core;
