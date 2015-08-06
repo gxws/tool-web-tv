@@ -6,18 +6,56 @@
 	<version>1.1.0-SNAPSHOT</version>
 
 	<properties>
+		<version.tool.common>1.2.0-RELEASE</version.tool.common>
 		<version.servlet.api>3.1.0</version.servlet.api>
 		<version.servlet.jstl>1.2</version.servlet.jstl>
+
+		<version.slf4j>1.7.12</version.slf4j>
+		<version.log4j2>2.3</version.log4j2>
+
+		<version.testng>6.9.6</version.testng>
 
 		<version.springframework>4.1.7.RELEASE</version.springframework>
 	</properties>
 
 	<dependencies>
 		<dependency>
+			<groupId>com.gxws</groupId>
+			<artifactId>tool-common</artifactId>
+			<version>${version.tool.common}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${version.springframework}</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${version.springframework}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${version.slf4j}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${version.testng}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${version.log4j2}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- servlet begin -->
