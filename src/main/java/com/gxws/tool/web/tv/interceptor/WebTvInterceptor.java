@@ -30,14 +30,9 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		try {
-			WebTvParam param = core.handleRequest(request);
-			request.setAttribute(WebTvParam.ATTR_NAME, param);
-			return true;
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return false;
-		}
+		WebTvParam param = core.handleRequest(request);
+		request.setAttribute(WebTvParam.ATTR_NAME, param);
+		return true;
 	}
 
 	/**
@@ -48,11 +43,12 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-//		WebTvParam param = (WebTvParam) request.getAttribute(WebTvParam.ATTR_NAME);
-//		if (null != param) {
-//			String urlparam = core.handleUrlParam(param);
-//			request.setAttribute(WebTvParam.URL_PARAM_NAME, urlparam);
-//		}
+		// WebTvParam param = (WebTvParam)
+		// request.getAttribute(WebTvParam.ATTR_NAME);
+		// if (null != param) {
+		// String urlparam = core.handleUrlParam(param);
+		// request.setAttribute(WebTvParam.URL_PARAM_NAME, urlparam);
+		// }
 	}
 
 	/**
@@ -63,7 +59,6 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-
 	}
 
 }
