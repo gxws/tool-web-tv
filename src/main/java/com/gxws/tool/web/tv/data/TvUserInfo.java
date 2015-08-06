@@ -2,14 +2,19 @@ package com.gxws.tool.web.tv.data;
 
 import java.io.Serializable;
 
+import com.gxws.tool.web.tv.annotation.WebTvParameter;
+
 /**
  * 电视用户信息
  * 
  * @author zhuwl120820@gxwsxx.com
+ * @deprecated 使用com.gxws.tool.web.tv.data.WebTvParam替代
  * @since 1.0
  */
+@Deprecated
 public class TvUserInfo implements Serializable {
 
+	private static final long serialVersionUID = -8378608874134427474L;
 	public final static String TV_USER_INFO_URL_PARAM_NAME = "tvParam";
 	public final static String TV_USER_INFO_OBJECT_NAME = "tvUserInfo";
 
@@ -25,6 +30,7 @@ public class TvUserInfo implements Serializable {
 	// 机顶盒类型
 	private String stbType;
 
+	@Deprecated
 	public String urlParam() {
 		StringBuffer sb = new StringBuffer("&");
 		sb.append(TvUserInfoType.STB_ID.getName());
