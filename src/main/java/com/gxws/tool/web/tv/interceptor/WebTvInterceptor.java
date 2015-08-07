@@ -3,8 +3,6 @@ package com.gxws.tool.web.tv.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -19,8 +17,6 @@ import com.gxws.tool.web.tv.data.WebTvParam;
  */
 public class WebTvInterceptor implements HandlerInterceptor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(WebTvInterceptor.class);
-
 	private WebTvCore core = new WebTvCore();
 
 	/**
@@ -30,8 +26,7 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		WebTvParam param = core.handleRequest(request);
-		request.setAttribute(WebTvParam.ATTR_NAME, param);
+		core.handleRequest(request);
 		return true;
 	}
 

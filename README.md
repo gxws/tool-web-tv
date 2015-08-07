@@ -21,4 +21,5 @@
 修改interceptor，将信息不完全的请求拦截报错。<br>
 修改机顶盒信息对象获取方式，从HttpServletRequest对象调用getAttribute方法，attr名称为WebTvParam.ATTR_NAME。jsp使用el获取具体参数的方式为${webTv.stbId}。<br>
 修改jsp使用el获取url参数的参数名，参数名修改为WebTvParam.URL_PARAM_NAME，调用方式为${webTv.url}。<br>
+修改将HttpServletRequest设置attr参数的操作，转移到core对象进行。<br>
 

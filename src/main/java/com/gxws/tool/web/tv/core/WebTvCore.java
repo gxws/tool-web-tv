@@ -1,5 +1,6 @@
 package com.gxws.tool.web.tv.core;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,10 +41,12 @@ public class WebTvCore {
 	 *             非法访问权限异常
 	 * @throws WebTvParameterIllegalException
 	 *             必要的参数非法异常
+	 * @throws UnsupportedEncodingException
 	 * @since 1.1
 	 */
-	public WebTvParam handleRequest(HttpServletRequest req) throws WebTvParameterMissingException,
-			IllegalArgumentException, IllegalAccessException, WebTvParameterIllegalException {
+	public WebTvParam handleRequest(HttpServletRequest req)
+			throws WebTvParameterMissingException, IllegalArgumentException, IllegalAccessException,
+			WebTvParameterIllegalException, UnsupportedEncodingException {
 		WebTvParam param = new WebTvParam();
 		Class<WebTvParam> cls = WebTvParam.class;
 		Field[] fields = cls.getDeclaredFields();
@@ -52,8 +55,12 @@ public class WebTvCore {
 		}
 		StbType type = handleStbType(param, req);
 		param.setStbType(type.getKey());
+		if (StbType.ONE.equals(type)) {
+			req.setCharacterEncoding("gb2312");
+		}
 		String url = handleUrlParam(param);
 		param.setUrl(url);
+		req.setAttribute(WebTvParam.ATTR_NAME, param);
 		return param;
 	}
 
