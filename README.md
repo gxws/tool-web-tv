@@ -17,6 +17,7 @@
 添加使用注解的方式对机顶盒访问参数WebTvParam声明处理方式。<br>
 添加机顶盒访问参数WebTvParam验证缺少参数时的异常WebTvParameterMissingException。<br>
 添加机顶盒类型判断，02和03由广电连接传，再经由http head user-agent判断01和02类型。<br>
+添加返回机顶盒需要展示的时间格式，年|月|日|星期|时|分|秒，例如：2015|8|6|4|23|59|55。<br>
 
 修改interceptor，将信息不完全的请求拦截报错。<br>
 修改机顶盒信息对象获取方式，从HttpServletRequest对象调用getAttribute方法，attr名称为WebTvParam.ATTR_NAME。jsp使用el获取具体参数的方式为${webTv.stbId}。<br>
