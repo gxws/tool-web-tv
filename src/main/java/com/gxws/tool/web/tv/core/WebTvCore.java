@@ -2,16 +2,14 @@ package com.gxws.tool.web.tv.core;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import com.gxws.tool.web.tv.annotation.WebTvParameter;
 import com.gxws.tool.web.tv.data.StbType;
-import com.gxws.tool.web.tv.data.TvUserInfo;
-import com.gxws.tool.web.tv.data.TvUserInfoType;
 import com.gxws.tool.web.tv.data.WebTvParam;
 import com.gxws.tool.web.tv.exception.WebTvParameterIllegalException;
 import com.gxws.tool.web.tv.exception.WebTvParameterMissingException;
@@ -25,6 +23,9 @@ import com.gxws.tool.web.tv.exception.WebTvParameterMissingException;
 public class WebTvCore {
 
 	private static final Pattern STB_0203 = Pattern.compile("(Safari)|(Chrome)", Pattern.CASE_INSENSITIVE);
+
+	private static final int[] CALENDAR_ARR = new int[] { Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH,
+			Calendar.DAY_OF_WEEK, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND };
 
 	/**
 	 * 处理request参数
@@ -48,6 +49,7 @@ public class WebTvCore {
 			throws WebTvParameterMissingException, IllegalArgumentException, IllegalAccessException,
 			WebTvParameterIllegalException, UnsupportedEncodingException {
 		WebTvParam param = new WebTvParam();
+		// 处理请求参数
 		Class<WebTvParam> cls = WebTvParam.class;
 		Field[] fields = cls.getDeclaredFields();
 		for (Field f : fields) {
@@ -55,9 +57,11 @@ public class WebTvCore {
 		}
 		StbType type = handleStbType(param, req);
 		param.setStbType(type.getKey());
+		// 根据机顶盒类型，设置request编码方式
 		if (StbType.ONE.equals(type)) {
 			req.setCharacterEncoding("gb2312");
 		}
+		// 处理url
 		String url = handleUrlParam(param);
 		param.setUrl(url);
 		req.setAttribute(WebTvParam.ATTR_NAME, param);
@@ -196,59 +200,31 @@ public class WebTvCore {
 	}
 
 	/**
-	 * 从request参数获取电视用户信息对象
+	 * 处理机顶盒展示要求的时间格式
 	 * 
 	 * @author zhuwl120820@gxwsxx.com
 	 * @param req
-	 *            信息来源
-	 * @return 用户信息对象
+	 *            HttpServletRequest对象
 	 * @since 1.0
 	 */
-	@Deprecated
-	public TvUserInfo getTvUserInfo(HttpServletRequest req) {
-		TvUserInfo info = new TvUserInfo();
-		info.setStbId(value(req, TvUserInfoType.STB_ID));
-		info.setDvbId(value(req, TvUserInfoType.DVB_ID));
-		info.setAreaId(value(req, TvUserInfoType.AREA_ID));
-		info.setStbType(value(req, TvUserInfoType.STB_TYPE));
-		return info;
-	}
-
-	/**
-	 * 从session获取电视机顶盒用户信息
-	 * 
-	 * @author zhuwl120820@gxwsxx.com
-	 * @param session
-	 *            信息来源
-	 * @return 用户信息对象
-	 * @since 1.0
-	 */
-	@Deprecated
-	public TvUserInfo getTvUserInfo(HttpSession session) {
-		TvUserInfo info = (TvUserInfo) session.getAttribute(TvUserInfo.TV_USER_INFO_OBJECT_NAME);
-		return info;
-	}
-
-	/**
-	 * 获取属性值
-	 * 
-	 * @author zhuwl120820@gxwsxx.com
-	 * @param req
-	 *            参数来源
-	 * @param type
-	 *            属性
-	 * @return 值
-	 * @since 1.0
-	 */
-	@Deprecated
-	private String value(HttpServletRequest req, TvUserInfoType type) {
-		String v = req.getParameter(type.getName());
-		if (null == v || "".equals(v)) {
-			v = req.getParameter(type.getInitName());
-			if (null == v) {
-				v = "";
+	public void handleWebTvTime(HttpServletRequest req) {
+		WebTvParam param = (WebTvParam) req.getAttribute(WebTvParam.ATTR_NAME);
+		StringBuilder sb = new StringBuilder();
+		Calendar c = Calendar.getInstance();
+		for (int i : CALENDAR_ARR) {
+			sb.append("|");
+			if (i == Calendar.MONTH) {
+				sb.append(c.get(i) + 1);
+			} else if (i == Calendar.DAY_OF_WEEK) {
+				if (1 == c.get(i)) {
+					sb.append("7");
+				} else {
+					sb.append(c.get(i) - 1);
+				}
+			} else {
+				sb.append(c.get(i));
 			}
 		}
-		return v;
+		param.setTime(sb.substring(1));
 	}
 }
