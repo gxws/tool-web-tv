@@ -7,7 +7,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gxws.tool.web.tv.core.WebTvCore;
-import com.gxws.tool.web.tv.data.WebTvParam;
 
 /**
  * 处理电视机顶盒访问参数
@@ -26,6 +25,7 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		// 处理参数
 		core.handleRequest(request);
 		return true;
 	}
@@ -38,12 +38,8 @@ public class WebTvInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		// WebTvParam param = (WebTvParam)
-		// request.getAttribute(WebTvParam.ATTR_NAME);
-		// if (null != param) {
-		// String urlparam = core.handleUrlParam(param);
-		// request.setAttribute(WebTvParam.URL_PARAM_NAME, urlparam);
-		// }
+		// 处理时间
+		core.handleWebTvTime(request);
 	}
 
 	/**
