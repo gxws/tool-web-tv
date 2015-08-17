@@ -37,6 +37,9 @@ public class WebTvParam implements Serializable {
 	// url参数
 	private String url;
 
+	// 时间
+	private String time;
+
 	public String getStbId() {
 		return stbId;
 	}
@@ -75,5 +78,13 @@ public class WebTvParam implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 }
