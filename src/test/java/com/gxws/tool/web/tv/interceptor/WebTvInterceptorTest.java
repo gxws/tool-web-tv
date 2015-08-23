@@ -11,11 +11,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.util.NestedServletException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gxws.tool.web.tv.data.WebTvParam;
+import com.gxws.tool.web.tv.exception.WebTvParameterException;
 
 @WebAppConfiguration
 @ContextConfiguration(locations = { "/test-spring.xml" })
@@ -34,14 +36,6 @@ public class WebTvInterceptorTest extends AbstractTestNGSpringContextTests {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-	/**
-	 * 完整参数
-	 * 
-	 * @author zhuwl120820@gxwsxx.com
-	 * @throws Exception
-	 *             异常
-	 * @since 1.1
-	 */
 	@Test
 	public void preHandleWithParam() throws Exception {
 		String param = "stbId=123&dvbId=213&areaId=321&stbType=0003";
@@ -54,48 +48,42 @@ public class WebTvInterceptorTest extends AbstractTestNGSpringContextTests {
 		Assert.assertEquals(p.getAreaId(), "321");
 		Assert.assertEquals(p.getStbType(), "0003");
 		Assert.assertEquals(p.getUrl(), "&" + param);
+		System.out.println(p.getTime());
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam0() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1")).andDo(MockMvcResultHandlers.print())
-				.andReturn();
-		Assert.assertNull(result.getModelAndView());
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1")).andDo(MockMvcResultHandlers.print()).andReturn();
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam1() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123"))
-				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123")).andDo(MockMvcResultHandlers.print())
+				.andReturn();
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam2() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123&dvbId=213"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123&dvbId=213"))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam3() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123&dvbId=213&areaId=321"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?stbId=123&dvbId=213&areaId=321"))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam4() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123"))
-				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123")).andDo(MockMvcResultHandlers.print())
+				.andReturn();
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleMissingParam5() throws Exception {
-		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123&user_id=213"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123&user_id=213"))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
 	}
 
 	@Test
@@ -142,14 +130,12 @@ public class WebTvInterceptorTest extends AbstractTestNGSpringContextTests {
 		Assert.assertEquals(p.getUrl(), "&stbId=123&dvbId=213&areaId=321&stbType=0002");
 	}
 
-	@Test
+	@Test(expectedExceptions = { NestedServletException.class, WebTvParameterException.class })
 	public void preHandleIllegalParam() throws Exception {
-		MvcResult result = mockMvc
-				.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123&user_id=213&area_code=321&stbType=0004")
-						.header("User-Agent",
-								"Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.107 Safari/537.36"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/testurl1?device_id=123&user_id=213&area_code=321&stbType=0004")
+				.header("User-Agent",
+						"Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.107 Safari/537.36"))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
-		Assert.assertNull(result.getModelAndView());
 	}
 
 }
